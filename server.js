@@ -109,8 +109,50 @@ app.post("/testpoint", (req, res) => {
 
 });
 
+app.post("/inventory/addcar", (req, res) => {
 
-app.post("/inventory/cars", (req, res) => {
+    const inventoryID = req.body.inventoryID;
+    const carBrand = req.body.carBrand;
+    const carName = req.body.carName;
+    const carColor = req.body.carColor;
+    const carType = req.body.carType;
+
+
+    pool.getConnection(function (err, connection) {
+
+
+        connection.query("SELECT inventoryID FROM cars WHERE inventoryID = ?", [inventoryID], (err, result) => {
+            if (err) throw err;
+
+
+            //You will get an array. if no users found it will return.
+
+            if (result.length > 0) {
+                console.log("we found a ID???");
+                console.log(result);
+                res.send({ errormessage: "ID already exists!" });
+
+                return;
+            } else {
+                connection.query("INSERT INTO cars (InventoryID, CarBrand, CarName, CarColor, CarType) VALUES (?,?,?,?,?)",
+                    [inventoryID, carBrand, carName, carColor, carType], (err, result) => {
+                    if (err) {
+                        res.send({ err: err });
+                        return;
+                    }
+                    res.send(result);
+                });
+                console.log("inserted new user!");
+                return;
+            }
+
+        });
+        connection.release();
+    });
+});
+
+
+app.post("/inventory/getcars", (req, res) => {
 
 
 
@@ -160,7 +202,7 @@ app.post("/users/login", (req, res) => {
    
             if (result.length > 0) {
                 res.send(result);
-               
+                
                 // res.send({message: "correct"});
             } else {
              
