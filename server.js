@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     if (req.method === 'OPTIONS') {
         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
+        return res.json({});
     }
     next();
 });
@@ -110,6 +110,38 @@ app.post("/testpoint", (req, res) => {
 });
 
 
+app.post("/inventory/cars", (req, res) => {
+
+
+
+
+    pool.getConnection(function (err, connection) {
+ 
+
+        console.log("You made it to this end point! getting cars!");
+        connection.query("SELECT * FROM cars",(err, result) => {
+            if (err) {
+                res.send({ err: err });
+
+            }
+            console.log(result);
+            if (result.length > 0) {
+                res.send(result);
+        
+
+                // res.send({message: "correct"});
+            } else {
+              
+                res.send({ errormessage: "No Cars!" });
+             
+            }
+
+        });
+        connection.release();
+    });
+});
+
+
 app.post("/users/login", (req, res) => {
 
     const username = req.body.username;
@@ -120,17 +152,19 @@ app.post("/users/login", (req, res) => {
         console.log(username, password);
 
         console.log("You made it to this end point!");
-        connection.query("SELECT * FROM users WHERE email = ? AND password = ?", [username, password], (err, result) => {
+        connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, result) => {
             if (err) {
                 res.send({ err: err });
-                return;
+             
             }
-
+   
             if (result.length > 0) {
                 res.send(result);
+               
                 // res.send({message: "correct"});
             } else {
-                res.send({ errormessage: "Wrong email or password" });
+             
+                res.send({ errormessage: "Wrong username or password" });
             }
 
         });
