@@ -90,6 +90,8 @@ app.post('/users/register', (req, res) => {
 });
 
 
+
+
 app.post("/testpoint", (req, res) => {
 
     const username = req.body.username;
@@ -108,6 +110,37 @@ app.post("/testpoint", (req, res) => {
     });
 
 });
+
+app.post("/inventory/deletecar", (req, res) => {
+    const inventoryID = req.body.inventoryID;
+   
+
+
+    pool.getConnection(function (err, connection) {
+        
+
+       // console.log("You made it to this end point!");
+        connection.query("DELETE FROM cars WHERE inventoryID = ?", [inventoryID], (err, result) => {
+            if (err) {
+                res.send({ err: err });
+                return;
+            }
+
+            if (result.length > 0) {
+                res.send(result);
+
+                // res.send({message: "correct"});
+            } else {
+
+                res.send({ errormessage: "Wrong username or password" });
+            }
+
+        });
+        connection.release();
+    });
+ 
+});
+
 
 app.post("/inventory/addcar", (req, res) => {
 
@@ -136,12 +169,12 @@ app.post("/inventory/addcar", (req, res) => {
             } else {
                 connection.query("INSERT INTO cars (InventoryID, CarBrand, CarName, CarColor, CarType) VALUES (?,?,?,?,?)",
                     [inventoryID, carBrand, carName, carColor, carType], (err, result) => {
-                    if (err) {
-                        res.send({ err: err });
-                        return;
-                    }
-                    res.send(result);
-                });
+                        if (err) {
+                            res.send({ err: err });
+                            return;
+                        }
+                        res.send(result);
+                    });
                 console.log("inserted new user!");
                 return;
             }

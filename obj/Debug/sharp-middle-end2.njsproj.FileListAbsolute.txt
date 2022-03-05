@@ -1,0 +1,3 @@
+C:\Users\Coryb\VS projects\sharp-middle-end2\sharp-middle-end2\obj\Debug\sharp-middle-end2.njsproj.AssemblyReference.cache
+C:\Users\Coryb\VS projects\sharp-middle-end2\sharp-middle-end2\obj\Debug\sharp-middle-end2.njsproj.CoreCompileInputs.cache
+C:\Users\Coryb\VS projects\sharp-middle-end2\sharp-middle-end2\bin\Microsoft.NodejsTools.WebRole.dll
