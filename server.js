@@ -188,37 +188,33 @@ app.post("/users/login", (req, res) => {
 
 app.post('/users/register', (req, res) => {
     const username = req.body.username;
-    const password = req.bodypassword;
+    const password = req.body.password;
     const password_confirmation = req.body.passwordConfirmation;
 
-
- 
+    console.log(password.length);
 
     pool.getConnection(function (err, connection) {
         console.log("Connected!");
 
-        /* if (!email || !password || !password_confirmation) {
-             res.send({ errormessage: "Please fill in all the fields" });
-             return;
-         }*/
-
-        //Check passwords match
-        //Check password length
-       /* if (password.length < 6) {
-            res.send({ errormessage: "Password should be atleast 6 characters" });
+        if (username == "" || password == "" || password_confirmation == "") {
+            res.send({ errormessageFields: "Please fill in all the fields" });
             return;
-
         }
         if (password != password_confirmation) {
-            console.log("Passwords dont match");
-            res.send({ errormessage: "Passwords dont match" });
+            res.send({ errormessagePassMatch: "Password should match" });
             return;
+
         }
-        */
-     
+        if (password.length < 6 || username.length < 6 || username.length > 15 || password.length > 15) {
+            res.send({ errormessageLength: "Usernames and passwords should be atleast 6 characters and at most 15 characters." });
+            return;
+
+        }
+
 
         connection.query("SELECT username FROM users WHERE username = ?", [username], (err, result) => {
             console.log(result);
+            console.log("lets go");
             if (err) {
                 res.send({ err: err });
 
@@ -230,29 +226,32 @@ app.post('/users/register', (req, res) => {
             if (result.length > 0) {
                 console.log("we found a user???");
                 console.log(result);
-                res.send({ errormessage: "Email already exists!" });
-
+                res.send({ errormessageUserExists: "username already exists!" });
+                return;
                 
             } else {
+                console.log("No user found!");
+                console.log(result);
                 connection.query("INSERT INTO users (username, password) VALUES (?,?)", [username, password], (err, result) => {
                     if (err) {
                         res.send({ err: err });
-                       
-                    }
-                    res.send(username);
+                    } 
+                    res.send({ successResIns: "inserted new user!" });
                 });
+                console.log(result);
                 console.log("inserted new user!");
-                connection.release();
+                ;
             }
 
         });
-     //   connection.release();
+        connection.release();
 
 
     });
 
 
 });
+
 
 
 app.get('/', function (req, res) {
