@@ -80,6 +80,76 @@ app.post("/inventory/deletecar", (req, res) => {
 });
 
 
+app.post("/inventory/updatecar", (req, res) => {
+
+    const inventoryID = req.body.inventoryID;
+    const carBrand = req.body.carBrand;
+    const carName = req.body.carName;
+    const carColor = req.body.carColor;
+    const carType = req.body.carType;
+    console.log(inventoryID, carBrand, carType);
+    /*
+     * 
+     * for some reason this end point does not use the VALUES(?,?,?) when using SQL call. I think it's because of the nature of SET. 
+     * 
+     * Side side note, we also do this in delete. no idea. need to investigate
+     * 
+     * */
+
+    pool.getConnection(function (err, connection) {
+        connection.query("UPDATE cars SET CarBrand = ?, CarName = ?, CarColor = ?, CarType = ? WHERE InventoryID = ?",
+            [carBrand, carName, carColor, carType, inventoryID], (err, result) => {
+                if (err) {
+                    res.send({ err: err });
+                    return;
+                }
+                console.log("UPDATE result : " + result);
+                res.sendStatus(200);
+            });
+
+
+        return;
+
+       /*
+        * Probably unneeded code as there is no point to checking if the ID exists. 
+        * Will keep around until it annoys me
+        * 
+        * connection.query("SELECT InventoryID FROM cars WHERE InventoryID = ?", [inventoryID], (err, result) => {
+            if (err) throw err;
+            console.log(result);
+
+            //You will get an array. if no users found it will return.
+
+            if (result.length < 0) {
+                console.log("we DIDNT find a ID???");
+                console.log(result);
+                //send bad request for invalid ID, but shouldn't happen because they need a selection of valid ID
+
+                return;
+            } else {
+
+                console.log("car ID found so we should update this entry");
+                //UPDATE call HERE
+                connection.query("UPDATE cars SET CarBrand = Bugatii WHERE InventoryID = 24",
+                    [carBrand, inventoryID], (err, result) => {
+                        if (err) {
+                            res.send({ err: err });
+                            return;
+                        }
+                        console.log("UPDATE result : " + result);
+                        res.send(result);
+                    });
+
+                
+                return;
+            }
+
+        });*/
+        connection.release();
+    });
+});
+
+
 app.post("/inventory/addcar", (req, res) => {
 
     const inventoryID = req.body.inventoryID;
@@ -88,6 +158,8 @@ app.post("/inventory/addcar", (req, res) => {
     const carColor = req.body.carColor;
     const carType = req.body.carType;
 
+
+  
 
     pool.getConnection(function (err, connection) {
 
@@ -172,12 +244,10 @@ app.post("/users/login", (req, res) => {
             }
    
             if (result.length > 0) {
-                res.send(result);
-                
-                // res.send({message: "correct"});
+                res.sendStatus(200);
             } else {
              
-                res.send({ errormessage: "Wrong username or password" });
+                res.sendStatus(400);
             }
 
         });
@@ -197,16 +267,18 @@ app.post('/users/register', (req, res) => {
         console.log("Connected!");
 
         if (username == "" || password == "" || password_confirmation == "") {
-            res.send({ errormessageFields: "Please fill in all the fields" });
+            res.sendStatus(400);
+          //  res.send({ errormessageFields: "Please fill in all the fields" });
             return;
         }
         if (password != password_confirmation) {
-            res.send({ errormessagePassMatch: "Password should match" });
+            res.sendStatus(400);
+          //  res.send({ errormessagePassMatch: "Password should match" });
             return;
 
         }
         if (password.length < 6 || username.length < 6 || username.length > 15 || password.length > 15) {
-            res.send({ errormessageLength: "Usernames and passwords should be atleast 6 characters and at most 15 characters." });
+            res.sendStatus(411);
             return;
 
         }
@@ -226,7 +298,7 @@ app.post('/users/register', (req, res) => {
             if (result.length > 0) {
                 console.log("we found a user???");
                 console.log(result);
-                res.send({ errormessageUserExists: "username already exists!" });
+                res.sendStatus(406);
                 return;
                 
             } else {
@@ -236,7 +308,7 @@ app.post('/users/register', (req, res) => {
                     if (err) {
                         res.send({ err: err });
                     } 
-                    res.send({ successResIns: "inserted new user!" });
+                    res.sendStatus(200);
                 });
                 console.log(result);
                 console.log("inserted new user!");
