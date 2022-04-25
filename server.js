@@ -325,6 +325,56 @@ app.post('/users/register', (req, res) => {
 });
 
 
+app.post('/users/updatepass', (req, res) => {
+    const username = req.body.username;
+    const newPassword = req.body.newPassword;
+    const newPasswordConfirmation = req.body.newPasswordConf;
+
+    console.log(newPassword.length);
+
+    console.log("password update end point!!");
+    console.log(newPassword + username + newPasswordConfirmation);
+
+    pool.getConnection(function (err, connection) {
+
+
+        if (newPassword == "" || newPasswordConfirmation == "") {
+            res.sendStatus(400);
+            //  res.send({ errormessageFields: "Please fill in all the fields" });
+            return;
+        }
+        if (newPassword != newPasswordConfirmation) {
+            res.sendStatus(400);
+            //  res.send({ errormessagePassMatch: "Password should match" });
+            return;
+
+        }
+        if (newPassword.length < 6 || newPassword.length > 15) {
+            res.sendStatus(411);
+            return;
+
+        }
+            connection.query("UPDATE users SET password = ? WHERE username = ?",
+                [newPassword, username], (err, result) => {
+                    if (err) {
+                        res.send({ err: err });
+                        return;
+                    }
+                    console.log("UPDATE result : " + result);
+                    res.sendStatus(200);
+                });
+
+
+            return;
+        connection.release();
+
+
+    });
+
+
+});
+
+
 
 app.get('/', function (req, res) {
     console.log("Connected!");
