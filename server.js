@@ -51,7 +51,7 @@ app.post("/testpoint", (req, res) => {
 
 app.post("/inventory/deletecar", (req, res) => {
     const inventoryID = req.body.inventoryID;
-   
+    console.log(inventoryID);
 
 
     pool.getConnection(function (err, connection) {
@@ -63,14 +63,14 @@ app.post("/inventory/deletecar", (req, res) => {
                 res.send({ err: err });
                 return;
             }
-
+            console.log(result);
             if (result.length > 0) {
-                res.send(result);
-
-                // res.send({message: "correct"});
+                console.log("god damnit");
+              
+          
             } else {
-
-                res.send({ errormessage: "Wrong username or password" });
+                console.log("tits");
+                res.sendStatus(200);
             }
 
         });
@@ -159,7 +159,7 @@ app.post("/inventory/addcar", (req, res) => {
     const carType = req.body.carType;
 
 
-  
+    console.log(carName);
 
     pool.getConnection(function (err, connection) {
 
@@ -231,11 +231,12 @@ app.post("/users/login", (req, res) => {
 
     const username = req.body.username;
     const password = req.body.password;
+    
 
 
     pool.getConnection(function (err, connection) {
         console.log(username, password);
-
+     
         console.log("You made it to this end point!");
         connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, result) => {
             if (err) {
